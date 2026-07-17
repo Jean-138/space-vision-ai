@@ -1,5 +1,5 @@
 from fastapi import FastAPI #importa a classe FastAPI da biblioteca fastapi
-
+from app.routes.analyze import router #importa routeer com o endpoint de analise
 
 #cria a instacia da aplicacao
 
@@ -9,8 +9,13 @@ app = FastAPI(
         version="1.0.0"
 )
 
+#Inclui as rotas do router
+#include_router() registra todas as rotas que estao em analyze.py
+app.include_router(router)
 
-# primeira rota
+
+
+# rota teste
 
 @app.get("/")
 def home():
