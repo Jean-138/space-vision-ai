@@ -22,5 +22,6 @@ def process_image(image_byte: bytes) -> bytes:
         new_height = int(height * ratio)
 
         image = cv2.resize(image, (new_width, new_height))#redimensiona a imagem
-        _, processed_bytes = cv2.imdecode(".jpg", image) #converte a imagem processada de volta pra bytes
-        return processed_bytes.tobytes()#Rrtorna os bytes prontos pra mandar pro gemini
+
+    _, processed_bytes = cv2.imencode(".jpg", image) #converte a imagem processada de volta pra bytes
+    return processed_bytes.tobytes()#Rrtorna os bytes prontos pra mandar pro gemini

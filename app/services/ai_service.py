@@ -12,7 +12,7 @@ load_dotenv() #Carrega as variáveis do arquivo .env
 #Configura o Gemini com a chave da API 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY")) #os.getenv busca o valor da variável ambiente GEMINI_API_KEY.
 
-model = genai.GenerativeModel("gemini-1.5-flash") #cria o modelo
+model = genai.GenerativeModel("gemini-3.6-flash")#cria o modelo
 
 
 
@@ -45,6 +45,7 @@ def analyze_space_image(image_bytes: bytes) -> SpaceAnalysisResponse:
 
 
     response_text = response.text #pega o texto da resposta
+    print(response_text)
     lines = response.text.split("\n") #extrai cada campo do texto separadamente
 
     
@@ -59,15 +60,22 @@ def analyze_space_image(image_bytes: bytes) -> SpaceAnalysisResponse:
     }
 
 
-#Percorre cada linha e identifica a qual campo pertence
-    for line in lines:
-        if line.startswith("OBJECT:"):
-            result["object_identified"] = line.replace("OBJECT:", "").strip()
-        elif line.startswith("DESCRIPTION:"):
-            result["description"] = line.replace("DESCRIPTION:", "").strip()
-        elif line.startswith("SIMPLE EXPLANATION:"):
-            result["simple_explanation"] = line.replace("SIMPLE EXPLANATION:", "").strip()
-        elif line.startswith("SCIENTIFIC INFO:"):
-            result["scientific_info"] = line.replace("SCIENTIFIC INFO:", "").strip()
     
+    current_field = None
+
+    #Percorre cada linha e identifica a qual campo pertence
+    for line in lines:
+        line = line.replace("**","").strip()
+        if line.startswith("OBJECT:"):
+            current_field = "object_identified"
+            result[current_field] = line.replace("OBJECT:", "").strip()
+        elif line.startswith("DESCRIPTION:"):
+            current_field = "description"
+        elif line.startswith("SIMPLE EXPLANATION:"):
+            current_field = "simple_explanation"
+        elif line.startswith("SCIENTIFIC INFO:"):
+            current_field = "scientific_info"
+        else:
+            if current_field:
+                result[current_field] += line + "\n"
     return SpaceAnalysisResponse(**result)
