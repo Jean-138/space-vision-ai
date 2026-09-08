@@ -66,6 +66,8 @@ def analyze_space_image(image_bytes: bytes) -> SpaceAnalysisResponse:
     #Percorre cada linha e identifica a qual campo pertence
     for line in lines:
         line = line.replace("**","").strip()
+        if not line or line == "---":
+            continue
         if line.startswith("OBJECT:"):
             current_field = "object_identified"
             result[current_field] = line.replace("OBJECT:", "").strip()
