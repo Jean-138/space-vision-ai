@@ -28,7 +28,12 @@ async def analyze_image(file: UploadFile = File(...)):
     file_extension = os.path.splitext(file.filename)[1].lower()
     if file_extension not in allowed_extensions: #Verifica se a extensão do arquivo é permitida
         raise HTTPException(status_code=400, detail="Invalid file type")
-    processed_bytes = process_image(image_bytes) #passa os bytes pro OpenCV processar
-    result = analyze_space_image(processed_bytes) #passa os bytes processados pro Gemini analisar
-    return result # retorna o resultado no formato do schema
+    try: #inicia o bloco de tratamento de erros
+        processed_bytes = process_image(image_bytes) #passa os bytes pro OpenCV processar
+        result = analyze_space_image(processed_bytes) #passa os bytes processados pro Gemini analisar
+        return result # retorna o resultado no formato do schema
+    except ValueError as e: #Captura erros de valor inválido retornados pelas funções
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception: #Captura qualquer outro erro inesperado no servidor
+        raise HTTPException(status_code=500, detail="Internal server error")
 
